@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module rename-to="WebTrader">
+  <!-- Inherit our applications main module.                      -->
+  <inherits name='org.DistributedATS.WebTrader' />
+
+  <!-- Specify the path to any remote services.                   -->
+  <servlet path="/WebTrader/fixservice" class="org.DistributedATS.server.FIXServiceInterfaceImpl" />
+
+</module>

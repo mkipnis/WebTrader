@@ -1,0 +1,73 @@
+/** Add css rules here for your application. */
+
+
+.title_web_trader {  
+  float : left;
+  font-family: Arial, Helvetica, sans-serif;
+  color: #001540;
+  font-size: 25px;
+  margin: 10px 5px 5px 10px;
+  height: inherit;
+};
+
+/** Example rules used by the template application (remove for your app) */
+h1 {
+  font-size: 2em;
+  font-weight: bold;
+  color: #777777;
+  margin: 40px 0px 70px;
+  text-align: center;
+}
+
+/* Style the header */
+.header {
+  background:  #C1CDE1;
+  width : 100%;
+  vertical-align: top;
+/*  padding: 5px;*/
+}
+
+
+.sendButton {
+  display: block;
+  font-size: 16pt;
+}
+
+/** Most GWT widgets already have a style name defined */
+.gwt-DialogBox {
+  width: 400px;
+}
+
+.dialogVPanel {
+  margin: 5px;
+}
+
+.serverResponseLabelError {
+  color: red;
+}
+
+
+.login_canvas {
+  background-color:  #C1CDE1;
+  width : 100%;
+  vertical-align: top;
+}
+
+.divTable{
+	font-family: Helvetica Neue; font-size : 15px;
+	display: table;
+	vertical-align: top;
+	width:100%;
+}
+.divTableRow {
+	display: table-row;
+	vertical-align: top;
+}
+
+.divTableCell 
+{
+	display: table-cell;
+	vertical-align: top;
+	width:50%
+}
+
