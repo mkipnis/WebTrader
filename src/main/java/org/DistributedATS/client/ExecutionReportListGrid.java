@@ -35,7 +35,10 @@ import com.smartgwt.client.types.SortDirection;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
+
+import org.DistributedATS.shared.ConvertUtils;
 import org.DistributedATS.shared.ExecutionReport;
+import org.DistributedATS.shared.Instrument;
 import org.DistributedATS.shared.Order;
 import org.DistributedATS.shared.PriceLevel;
 
@@ -141,6 +144,8 @@ public class ExecutionReportListGrid extends ListGrid {
           order.getExecutionReports().get(execReportId);
 
       ListGridRecord record = new ListGridRecord();
+      
+      Instrument instrument_with_ref_data = WebTrader.getInstance().getInstrumentWithRefData(order.instrument);
 
       record.setAttribute(ExecutionReportListGrid.EXEC_REPORT_ID_FIELD,
                           execReport.executionReportId);
@@ -149,11 +154,11 @@ public class ExecutionReportListGrid extends ListGrid {
       record.setAttribute(ExecutionReportListGrid.EXEC_REPORT_STATUS_FIELD,
                           ExecutionReport.getStatusText(execReport.status));
       record.setAttribute(ExecutionReportListGrid.EXEC_REPORT_FILL_PRICE_FIELD,
-                          execReport.fillPrice / PriceLevel.TICK_SIZE);
+    		  ConvertUtils.getDisplayPrice(instrument_with_ref_data, (int)execReport.fillPrice));
       record.setAttribute(ExecutionReportListGrid.EXEC_REPORT_FILL_QTY_FIELD,
-                          execReport.fillQty);
+                          execReport.fillQty); 
       record.setAttribute(ExecutionReportListGrid.EXEC_REPORT_AVG_PRICE_FIELD,
-                          execReport.filledAvgPx / PriceLevel.TICK_SIZE);
+    		  ConvertUtils.getDisplayPrice(instrument_with_ref_data, (int)execReport.filledAvgPx));
       record.setAttribute(ExecutionReportListGrid.EXEC_REPORT_CUM_QTY_FIELD,
                           execReport.cumFilledQty);
 

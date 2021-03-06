@@ -31,6 +31,7 @@ import com.smartgwt.client.data.DataSource;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.DragDataAction;
 import com.smartgwt.client.types.ListGridFieldType;
+import com.smartgwt.client.types.SortDirection;
 import com.smartgwt.client.types.VerticalAlignment;
 import com.smartgwt.client.widgets.Button;
 import com.smartgwt.client.widgets.TransferImgButton;
@@ -43,6 +44,8 @@ import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.HStack;
 import com.smartgwt.client.widgets.layout.VStack;
 import java.util.ArrayList;
+
+import org.DistributedATS.shared.ConvertUtils;
 import org.DistributedATS.shared.Instrument;
 
 public class InstrumentPicker extends Window {
@@ -50,6 +53,7 @@ public class InstrumentPicker extends Window {
   public static String INSTRUMENT_NAME_FIELD = "INSTRUMENT_NAME_FIELD";
   public static String EXCHANGE_NAME_FIELD = "EXCHANGE_NAME";
   public static String SYMBOL_FIELD = "SYMBOL_NAME";
+  public static String MATURITY_DATE_FIELD = "MATURITY_DATE_FIELD";
 
   public InstrumentPicker(final MarketDataCanvas canvas) {
     setTitle("Instrument Picker");
@@ -76,6 +80,11 @@ public class InstrumentPicker extends Window {
 
     ListGridField symbolField = new ListGridField(SYMBOL_FIELD, SYMBOL_FIELD);
     symbolField.setAlign(Alignment.LEFT);
+    
+    ListGridField maturityDateField = new ListGridField(MATURITY_DATE_FIELD, MATURITY_DATE_FIELD);
+    maturityDateField.setAlign(Alignment.LEFT);
+    
+    maturityDateField.setHidden(true);
 
     int user_securities_size = 0;
 
@@ -102,14 +111,19 @@ public class InstrumentPicker extends Window {
           EXCHANGE_NAME_FIELD, instrument.getSecurityExchange());
       listGridRecordsAllSecurities[index].setAttribute(SYMBOL_FIELD,
                                                        instrument.getSymbol());
+      
+      listGridRecordsAllSecurities[index].setAttribute(MATURITY_DATE_FIELD,
+              ConvertUtils.intToDate( instrument.getMaturityDate() ));
 
       index++;
     }
 
     instrumentListGrid1.setFields(instrumentNameField, exchangeNameField,
-                                  symbolField);
+                                  symbolField, maturityDateField);
     instrumentListGrid1.setData(listGridRecordsAllSecurities);
     hStack.addMember(instrumentListGrid1);
+    
+    instrumentListGrid1.sort(MATURITY_DATE_FIELD, SortDirection.ASCENDING);
 
     final ListGrid instrumentListGrid2 = new ListGrid();
     instrumentListGrid2.setWidth(250);

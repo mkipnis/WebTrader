@@ -37,32 +37,32 @@ public class MarketDataSnapshot implements Serializable {
 		
 	}
 	
-	public void setLastTradedPrice( Double lastTradedPrice )
+	public void setLastTradedPrice( Integer lastTradedPrice )
 	{
-		this.lastTradedPrice = lastTradedPrice/PriceLevel.TICK_SIZE;
+		this.lastTradedPrice = lastTradedPrice;//lastTradedPrice/PriceLevel.TICK_SIZE;
 	}
 	
-	public Double getLastTradedPrice()
+	public Integer getLastTradedPrice()
 	{
 		return this.lastTradedPrice;
 	}
 	
-	public void setVolume( Double volume )
+	public void setVolume( int volume )
 	{
 		this.volume = volume;
 	}
 	
-	public Double getVolume()
+	public Integer getVolume()
 	{
 		return this.volume;
 	}
 	
-	public void setOpenPrice( Double openPrice )
+	public void setOpenPrice( int openPrice )
 	{	
-		this.openPrice = openPrice/PriceLevel.TICK_SIZE;
+		this.openPrice = openPrice; // PriceLevel.TICK_SIZE;
 	}
 	
-	public Double getOpenPrice()
+	public Integer getOpenPrice()
 	{
 		return this.openPrice;
 	}
@@ -99,9 +99,9 @@ public class MarketDataSnapshot implements Serializable {
 	
 	private long marketDataSequenceNumber;
 	
-	private Double lastTradedPrice = 0.0;
-	private Double volume = 0.0;
-	private Double openPrice = 0.0;
+	private Integer lastTradedPrice = 0;
+	private Integer volume = 0;
+	private Integer openPrice = 0;
 	private HashMap<Integer, PriceLevel> bidSide = new HashMap<Integer, PriceLevel>();
 	private HashMap<Integer, PriceLevel> askSide = new HashMap<Integer, PriceLevel>();	
 

@@ -148,9 +148,21 @@ public class WebTrader implements EntryPoint {
   }
 
   public Instrument getActiveInstrument() { return activeInstrument; }
+  
+  public Instrument getInstrumentWithRefData( Instrument instrument )
+  {
+	    Integer instrumentWithRefDataIndex = WebTrader.getInstance().getCompleteSecurityList().indexOf(instrument);
+	    
+	    Instrument instrumentWithRefData = WebTrader.getInstance().getCompleteSecurityList().get(instrumentWithRefDataIndex);
+	    
+	    return instrumentWithRefData;
+  }
 
   public void setActiveInstrument(Instrument instrument) {
-    this.activeInstrument = instrument;
+	    
+	    Instrument instrumentWithRefData = getInstrumentWithRefData( instrument );
+	    
+    this.activeInstrument = instrumentWithRefData;
   }
 
   public FIXServiceInterfaceAsync getFIXService() { return fixService; }

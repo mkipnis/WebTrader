@@ -119,8 +119,8 @@ public class MarketDataProcessorThread implements Runnable {
           group.getField(entrySize);
 
           PriceLevel priceLevel =
-              new PriceLevel(entryType.getValue(), entryPrice.getValue(),
-                             entrySize.getValue());
+              new PriceLevel(entryType.getValue(), (int)entryPrice.getValue(),
+                             (int)entrySize.getValue());
 
           switch (entryType.getValue()) {
           case MDEntryType.BID:
@@ -130,13 +130,13 @@ public class MarketDataProcessorThread implements Runnable {
             marketDataSnapshot.insertAsk(askLevel++, priceLevel);
             break;
           case MDEntryType.TRADE_VOLUME:
-            marketDataSnapshot.setVolume(entrySize.getValue());
+            marketDataSnapshot.setVolume((int)entrySize.getValue());
             break;
           case MDEntryType.TRADE:
-            marketDataSnapshot.setLastTradedPrice(entryPrice.getValue());
+            marketDataSnapshot.setLastTradedPrice((int)entryPrice.getValue());
             break;
           case MDEntryType.OPENING_PRICE:
-            marketDataSnapshot.setOpenPrice(entryPrice.getValue());
+            marketDataSnapshot.setOpenPrice((int)entryPrice.getValue());
             break;
           default:
           };
@@ -187,8 +187,8 @@ public class MarketDataProcessorThread implements Runnable {
           }
 
           PriceLevel priceLevel =
-              new PriceLevel(entryType.getValue(), entryPrice.getValue(),
-                             entrySize.getValue());
+              new PriceLevel(entryType.getValue(), (int)entryPrice.getValue(),
+                             (int)entrySize.getValue());
 
           switch (entryType.getValue()) {
           case MDEntryType.BID:
@@ -200,13 +200,13 @@ public class MarketDataProcessorThread implements Runnable {
             marketDataSnapshot.insertAsk(currentAskLevel++, priceLevel);
             break;
           case MDEntryType.TRADE_VOLUME:
-            marketDataSnapshot.setVolume(entrySize.getValue());
+            marketDataSnapshot.setVolume((int)entrySize.getValue());
             break;
           case MDEntryType.TRADE:
-            marketDataSnapshot.setLastTradedPrice(entryPrice.getValue());
+            marketDataSnapshot.setLastTradedPrice((int)entryPrice.getValue());
             break;
           case MDEntryType.OPENING_PRICE:
-            marketDataSnapshot.setOpenPrice(entryPrice.getValue());
+            marketDataSnapshot.setOpenPrice((int)entryPrice.getValue());
             break;
           default:
           };

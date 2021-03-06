@@ -41,7 +41,7 @@ public interface FIXServiceInterfaceAsync {
   void logout(String username, AsyncCallback<FIXUserSession> callback);
 
   void submitOrder(String username, String token, String buy_or_sell,
-                   Instrument instrument, Double price, Double size,
+                   Instrument instrument, Integer price_in_ticks, Integer size,
                    AsyncCallback<Order> callback);
 
   void getLastestSessionState(SessionStateRequest sessionStateRequest,

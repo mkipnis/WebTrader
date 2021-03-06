@@ -29,11 +29,19 @@ package org.DistributedATS.server;
 
 
 
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.List;
 
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import org.DistributedATS.shared.ConvertUtils;
 import org.DistributedATS.shared.Instrument;
+import org.json.JSONObject;
 
 import quickfix.ApplicationExtended;
 import quickfix.DoNotSend;
@@ -50,6 +58,11 @@ import quickfix.UnsupportedMessageType;
 import quickfix.field.MsgType;
 import quickfix.field.SecurityExchange;
 import quickfix.field.Symbol;
+import quickfix.field.Text;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class FIXApplication implements ApplicationExtended {
 
@@ -115,8 +128,24 @@ public class FIXApplication implements ApplicationExtended {
           quickfix.field.SecurityExchange securityExchange =
               new SecurityExchange();
           group.getField(securityExchange);
-          securtiesList.add(
-              new Instrument(securityExchange.getValue(), symbol.getValue()));
+ 
+          Instrument instrument = new Instrument( securityExchange.getValue(), symbol.getValue() );
+          
+          quickfix.field.Text text = new Text();
+ 
+          if ( group.isSetField(text) )
+          {	  
+        	  group.getField(text);
+                            
+        	  String ref_data_text = text.getValue();
+          
+        	  if ( ref_data_text !=null && !ref_data_text.equals(""))
+        	  {
+        		  RefDataUtils.poulateRefData(instrument, ref_data_text);
+        	  }
+          }
+                 
+          securtiesList.add(instrument);
         }
       } else if (msgType.getValue().equals(
                      MsgType.MARKET_DATA_SNAPSHOT_FULL_REFRESH) ||

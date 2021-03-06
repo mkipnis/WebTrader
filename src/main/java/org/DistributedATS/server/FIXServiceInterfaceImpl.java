@@ -92,12 +92,12 @@ public class FIXServiceInterfaceImpl extends RemoteServiceServlet
 
   @Override
   public Order submitOrder(String username, String token, String buy_or_sell,
-                           Instrument instrument, Double price,
-                           Double quantity) {
+                           Instrument instrument, Integer price_in_ticks,
+                           Integer quantity) {
     // TODO Auto-generated method stub
     System.out.println(username + " : "
                        + " : " + buy_or_sell + " : " +
-                       instrument.getInstrumentName() + " : " + price + " : " +
+                       instrument.getInstrumentName() + " : " + price_in_ticks + " : " +
                        quantity);
 
     FIXClientContextListener fixClientContextListener =
@@ -128,15 +128,13 @@ public class FIXServiceInterfaceImpl extends RemoteServiceServlet
             new ClOrdID(order.orderKey.getOrderKey()), side, new TransactTime(),
             new OrdType(order.orderType));
 
-    price = price * PriceLevel.TICK_SIZE;
-
     newOrderSingle.set(new OrderQty(quantity));
     newOrderSingle.set(new Symbol(instrument.getSymbol()));
     newOrderSingle.set(new SecurityExchange(instrument.getSecurityExchange()));
     newOrderSingle.set(new HandlInst('1'));
-    newOrderSingle.set(new Price(price));
+    newOrderSingle.set(new Price(price_in_ticks));
 
-    order.price = price;
+    order.price = price_in_ticks;
     order.quantity = quantity;
     order.instrument = instrument;
     order.status = ExecutionReport.PENDING_NEW;

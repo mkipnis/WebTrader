@@ -88,6 +88,13 @@ public class MarketDataCanvas extends Canvas {
   public static String SYMBOL_FIELD = "SYMBOL_FIELD";
   // public static String MARKET_DATA_STATE = "MARKET_DATA_STATE";
   public static String PRICE_CHANGE = "PRICE_CHANGE";
+  
+  public static String TICKS_FIELD = "TICKS_FIELD";
+  
+  public static String CUSIP_FIELD = "CUSIP_FIELD";
+  public static String MATURITY_FIELD = "MATURITY_FIELD";
+  
+  public static String MATURITY_DATE_FIELD = "MATURITY_DATE_FIELD";
 
   public static int BID_CHANGE_BIT = 0;
   public static int ASK_CHANAGE_BIT = 1;

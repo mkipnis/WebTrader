@@ -31,16 +31,16 @@ import java.io.Serializable;
 
 public class PriceLevel implements Serializable {
 	
-	public static int TICK_SIZE = 100;
+	//public static int TICK_SIZE = 100;
 	
 	public PriceLevel()
 	{
 	}
 	
-	public PriceLevel( char side, Double price, Double size )
+	public PriceLevel( char side, int price, int size )
 	{
 		this.side = side;
-		this.price = price/PriceLevel.TICK_SIZE;
+		this.price = price; //PriceLevel.TICK_SIZE;
 		this.size = size;
 	}
 	
@@ -49,18 +49,18 @@ public class PriceLevel implements Serializable {
 		return side;
 	}
 	
-	public Double getPrice()
+	public Integer getPrice()
 	{
 		return price;
 	}
 	
-	public double getSize()
+	public Integer getSize()
 	{
 		return size;
 	}
 	
-	private Double price = new Double(0);
-	private Double size = new Double(0); 
+	private Integer price = 0;
+	private Integer size = 0; 
 	private char side;
 
 }

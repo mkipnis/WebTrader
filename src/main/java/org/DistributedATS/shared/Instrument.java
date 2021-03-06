@@ -42,6 +42,45 @@ public class Instrument implements Serializable {
 		this.symbol = symbol;
 	}
 	
+	public void setCusip( String cusip )
+	{
+		this.cusip = cusip;
+	}
+	
+	public void setIssueDate( Integer issueDate )
+	{
+		this.issueDate = issueDate;
+	}
+	
+	public void setMaturityDate( Integer maturityDate )
+	{
+		this.maturityDate = maturityDate;
+	}
+	
+	public void setTickSize(Integer tickSize )
+	{
+		this.tickSize = tickSize;
+	}
+	
+	public String getCusip()
+	{
+		return this.cusip;
+	}
+	
+	public Integer getIssueDate()
+	{
+		return this.issueDate;
+	}
+	
+	public Integer getMaturityDate()
+	{
+		return this.maturityDate;
+	}
+	
+	public Integer getTickSize()
+	{
+		return this.tickSize;
+	}
 	
 	@Override
 	public boolean equals(Object o) 
@@ -77,10 +116,17 @@ public class Instrument implements Serializable {
 	
 	public String getInstrumentName()
 	{
-		return securityExchange+":"+symbol;
+		return securityExchange+" : "+symbol;
 	}
 	
 	private String symbol;
 	private String securityExchange;
+	
+	private String cusip = "";
+	
+	private Integer issueDate = new Integer(0);
+	private Integer maturityDate = new Integer(0);
+	
+	private Integer tickSize = 100;
 	
 }

@@ -46,7 +46,7 @@ public interface FIXServiceInterface extends RemoteService {
   FIXUserSession
   getLastestSessionState(SessionStateRequest sessionStateRequest);
   Order submitOrder(String username, String token, String buy_or_sell,
-                    Instrument instrument, Double price, Double size);
+                    Instrument instrument, Integer price_in_ticks, Integer size);
   String cancelOrder(String username, String token, Order orderIn);
   String cancelAllOrders(String username, String token);
 }

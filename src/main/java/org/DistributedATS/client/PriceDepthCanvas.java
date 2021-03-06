@@ -29,8 +29,10 @@ package org.DistributedATS.client;
 
 import com.google.gwt.i18n.client.NumberFormat;
 import com.smartgwt.client.data.DataSource;
+import com.smartgwt.client.data.DataSourceField;
 import com.smartgwt.client.data.fields.DataSourceFloatField;
 import com.smartgwt.client.data.fields.DataSourceIntegerField;
+import com.smartgwt.client.data.fields.DataSourceTextField;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.VerticalAlignment;
 import com.smartgwt.client.widgets.Canvas;
@@ -40,6 +42,9 @@ import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import java.util.ArrayList;
+
+import org.DistributedATS.shared.ConvertUtils;
+import org.DistributedATS.shared.Instrument;
 import org.DistributedATS.shared.MarketDataSnapshot;
 import org.DistributedATS.shared.PriceLevel;
 
@@ -88,12 +93,12 @@ public class PriceDepthCanvas extends Canvas {
     priceLevelIndexDS.setPrimaryKey(true);
     ds.addField(priceLevelIndexDS);
 
-    DataSourceFloatField bidPriceDS =
-        new DataSourceFloatField(PriceDepthCanvas.BID_PRICE_FIELD);
+    DataSourceField bidPriceDS =
+        new DataSourceTextField(PriceDepthCanvas.BID_PRICE_FIELD);
     ds.addField(bidPriceDS);
 
-    DataSourceFloatField askPriceDS =
-        new DataSourceFloatField(PriceDepthCanvas.ASK_PRICE_FIELD);
+    DataSourceField askPriceDS =
+        new DataSourceTextField(PriceDepthCanvas.ASK_PRICE_FIELD);
     ds.addField(askPriceDS);
 
     DataSourceFloatField bidSizeDS =
@@ -111,7 +116,7 @@ public class PriceDepthCanvas extends Canvas {
     addChild(listGrid);
   }
 
-  public void updatePriceDepth(MarketDataSnapshot marketDataSnapshot) {
+  public void updatePriceDepth(Instrument instrument_with_ref_data, MarketDataSnapshot marketDataSnapshot) {
     DataSource ds = listGrid.getDataSource();
 
     for (ListGridRecord record : currentRecords) {
@@ -130,7 +135,7 @@ public class PriceDepthCanvas extends Canvas {
 
       if (bid != null) {
         if (bid.getSize() > 0) {
-          record.setAttribute(BID_PRICE_FIELD, bid.getPrice());
+          record.setAttribute(BID_PRICE_FIELD, ConvertUtils.getDisplayPrice(instrument_with_ref_data, bid.getPrice()));
           record.setAttribute(BID_SIZE_FIELD, bid.getSize());
         } else {
           record.setAttribute(BID_PRICE_FIELD, "");
@@ -140,7 +145,7 @@ public class PriceDepthCanvas extends Canvas {
 
       if (ask != null) {
         if (ask.getSize() > 0) {
-          record.setAttribute(ASK_PRICE_FIELD, ask.getPrice());
+          record.setAttribute(ASK_PRICE_FIELD, ConvertUtils.getDisplayPrice(instrument_with_ref_data, ask.getPrice()));
           record.setAttribute(ASK_SIZE_FIELD, ask.getSize());
         } else {
           record.setAttribute(ASK_PRICE_FIELD, "");

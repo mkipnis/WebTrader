@@ -32,13 +32,21 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.data.Record;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.TitleOrientation;
+import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.FormItemValueFormatter;
+import com.smartgwt.client.widgets.form.events.ItemChangeEvent;
+import com.smartgwt.client.widgets.form.events.ItemChangedEvent;
+import com.smartgwt.client.widgets.form.events.ItemChangedHandler;
 import com.smartgwt.client.widgets.form.fields.BlurbItem;
 import com.smartgwt.client.widgets.form.fields.FormItem;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.form.fields.SubmitItem;
+import com.smartgwt.client.widgets.form.fields.events.ChangeEvent;
+import com.smartgwt.client.widgets.form.fields.events.ChangeHandler;
+import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
+import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
 import org.DistributedATS.shared.FIXUserSession;
 import org.DistributedATS.shared.Order;
@@ -60,11 +68,11 @@ public class TicketCanvas extends Canvas {
     public void onClick(ClickEvent event) {
 
       // TODO Auto-generated method stub
-      SpinnerItem priceItem = (SpinnerItem)ticketForm.getItem("Price");
+    	SpinnerItemWebTrader priceItem = (SpinnerItemWebTrader)ticketForm.getItem("Price");
       SpinnerItem quantityItem = (SpinnerItem)ticketForm.getItem("Quantity");
 
-      Object price = priceItem.getValue();
-      Object quantity = quantityItem.getValue();
+      Integer price_in_ticks = priceItem.getValueInTicks();
+      Integer quantity = ((Integer)quantityItem.getValue());
 
       final FIXUserSession fixUserSession =
           UserSessionSingleton.getInstance().getFIXUserSession();
@@ -72,7 +80,7 @@ public class TicketCanvas extends Canvas {
       webTrader.getFIXService().submitOrder(
           fixUserSession.username, fixUserSession.token,
           event.getItem().getName(), webTrader.getActiveInstrument(),
-          new Double(price.toString()), new Double(quantity.toString()),
+          price_in_ticks, quantity,
           new AsyncCallback<Order>() {
             @Override
             public void onFailure(Throwable caught) {
@@ -89,15 +97,17 @@ public class TicketCanvas extends Canvas {
     }
   }
 
-  public void populateTicket(Double price, Integer quantity) {
-    SpinnerItem priceItem = (SpinnerItem)ticketForm.getItem("Price");
+  public void populateTicket(Integer price, Integer quantity) {
+	SpinnerItemWebTrader priceItem = (SpinnerItemWebTrader)ticketForm.getItem("Price");
     SpinnerItem quantityItem = (SpinnerItem)ticketForm.getItem("Quantity");
 
     instrumentLabel.setValue(
         "<font color='blue'>" +
         webTrader.getActiveInstrument().getInstrumentName() + "</font color>");
 
-    priceItem.setValue(price);
+    priceItem.setValue( price, webTrader.getActiveInstrument() );
+    //priceItem.setValue("100-25");
+
     quantityItem.setValue(quantity);
   }
 
@@ -143,7 +153,7 @@ public class TicketCanvas extends Canvas {
     instrumentLabel.setDefaultValue(
         "<font color='black'>Select Instrument on the market data panel.</font>");
 
-    SpinnerItem priceSpinnerItem = new SpinnerItem();
+    SpinnerItemWebTrader priceSpinnerItem = new SpinnerItemWebTrader();
     priceSpinnerItem.setName("Price");
     priceSpinnerItem.setDefaultValue(1);
     priceSpinnerItem.setRowSpan(2);
@@ -152,21 +162,7 @@ public class TicketCanvas extends Canvas {
     priceSpinnerItem.setStep(0.05);
     priceSpinnerItem.setStartRow(false);
     priceSpinnerItem.setEndRow(false);
-    
-    priceSpinnerItem.setEditorValueFormatter(new FormItemValueFormatter (){
-
-  		@Override
-  		public String formatValue(Object value, Record record, DynamicForm form, FormItem item) {
-  			// TODO Auto-generated method stub
-  			 if (value == null) return null;  
-                  try {  
-                      NumberFormat nf = NumberFormat.getFormat("#,##0.00");  
-                      return nf.format(((Number) value).doubleValue());  
-                  } catch (Exception e) {  
-                      return value.toString();  
-                  }  
-  		}  
-      });  
+   
 
     SpinnerItem quantitySpinnerItem = new SpinnerItem();
     quantitySpinnerItem.setName("Quantity");
@@ -214,6 +210,14 @@ public class TicketCanvas extends Canvas {
     ticketForm.setFields(instrumentLabel, priceSpinnerItem, quantitySpinnerItem,
                          buyButton, sellButton, cancelAllButton);
     ticketForm.draw();
+    
+    ticketForm.addItemChangedHandler(new ItemChangedHandler() {
+        @Override
+        public void onItemChanged(ItemChangedEvent itemChangedEvent) {
+          //  SC.say("Spinner value changed! (ItemChangedEvent)");
+        }
+    });
+   
     
     webTraderSectionCanvas.setSectionStackCanvas(ticketForm);
     

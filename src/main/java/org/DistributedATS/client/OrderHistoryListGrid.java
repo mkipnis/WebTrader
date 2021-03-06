@@ -45,6 +45,8 @@ import com.smartgwt.client.widgets.grid.events.RecordClickEvent;
 import com.smartgwt.client.widgets.grid.events.RecordClickHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import java.util.HashMap;
+
+import org.DistributedATS.shared.ConvertUtils;
 import org.DistributedATS.shared.ExecutionReport;
 import org.DistributedATS.shared.FIXUserSession;
 import org.DistributedATS.shared.Instrument;
@@ -59,6 +61,7 @@ public class OrderHistoryListGrid extends ListGrid {
 
   public static String ORDER_ID = "ORDER_ID_FIELD";
   public static String INSTRUMENT_FIELD = "INSTRUMENT_FIELD";
+  public static String CUSIP_FIELD = "CUSIP_FIELD";
   public static String SIDE_FIELD = "SIDE_FIELD";
   public static String PRICE_FIELD = "PRICE_FIELD";
   public static String QTY_FIELD = "QTY_FIELD";
@@ -86,6 +89,10 @@ public class OrderHistoryListGrid extends ListGrid {
     ListGridField instrumentField =
         new ListGridField(OrderHistoryListGrid.INSTRUMENT_FIELD, "Instrument");
     instrumentField.setWidth(150);
+    
+    ListGridField cusipField =
+            new ListGridField(OrderHistoryListGrid.CUSIP_FIELD, "Cusip");
+    cusipField.setWidth(150);
 
     ListGridField sideField =
         new ListGridField(OrderHistoryListGrid.SIDE_FIELD, "Side");
@@ -131,13 +138,18 @@ public class OrderHistoryListGrid extends ListGrid {
     DataSourceTextField instrumentDS =
         new DataSourceTextField(OrderHistoryListGrid.INSTRUMENT_FIELD);
     ds.addField(instrumentDS);
+    
+    DataSourceTextField cusipDS =
+            new DataSourceTextField(OrderHistoryListGrid.CUSIP_FIELD);
+        ds.addField(cusipDS);
+
 
     DataSourceTextField sideDS =
         new DataSourceTextField(OrderHistoryListGrid.SIDE_FIELD);
     ds.addField(sideDS);
 
-    DataSourceFloatField priceFieldDS =
-        new DataSourceFloatField(OrderHistoryListGrid.PRICE_FIELD);
+    DataSourceTextField priceFieldDS =
+        new DataSourceTextField(OrderHistoryListGrid.PRICE_FIELD);
     ds.addField(priceFieldDS);
 
     DataSourceFloatField quantityFieldDS =
@@ -148,8 +160,8 @@ public class OrderHistoryListGrid extends ListGrid {
         new DataSourceFloatField(OrderHistoryListGrid.FILLED_QTY_FIELD);
     ds.addField(filledQuantityDS);
 
-    DataSourceFloatField filledPriceDS =
-        new DataSourceFloatField(OrderHistoryListGrid.FILLED_PRICE_FIELD);
+    DataSourceTextField filledPriceDS =
+        new DataSourceTextField(OrderHistoryListGrid.FILLED_PRICE_FIELD);
     ds.addField(filledPriceDS);
 
     DataSourceDateTimeField lastUpdateTimestampDS =
@@ -165,7 +177,7 @@ public class OrderHistoryListGrid extends ListGrid {
         new DataSourceTextField(OrderHistoryListGrid.ORDER_STATUS_FIELD);
     ds.addField(orderStatusFieldDS);
 
-    setFields(orderIdField, instrumentField, sideField, priceField,
+    setFields(orderIdField, instrumentField, cusipField, sideField, priceField,
               quantityField, filledQuantityField, filledPriceField,
               orderStatusField, lastUpdateTimestampField,
               lastExecutionReportIdField);
@@ -279,17 +291,23 @@ public class OrderHistoryListGrid extends ListGrid {
     Order order = orderMap.get(orderIn.orderKey);
 
     DataSource ds = getDataSource();
+    
+    Instrument instrument_with_ref_data = WebTrader.getInstance().getInstrumentWithRefData(orderIn.instrument);
+    orderIn.instrument = instrument_with_ref_data;
+
 
     if (order == null) {
       ListGridRecord record = new ListGridRecord();
 
       record.setAttribute(OrderHistoryListGrid.INSTRUMENT_FIELD,
                           orderIn.instrument.getInstrumentName());
+      record.setAttribute(OrderHistoryListGrid.CUSIP_FIELD,
+              orderIn.instrument.getCusip());
       record.setAttribute(OrderHistoryListGrid.ORDER_ID,
                           orderIn.orderKey.getOrderKey());
       record.setAttribute(OrderHistoryListGrid.SIDE_FIELD, orderIn.getSide());
       record.setAttribute(OrderHistoryListGrid.PRICE_FIELD,
-                          orderIn.price / PriceLevel.TICK_SIZE);
+    		  	ConvertUtils.getDisplayPrice(instrument_with_ref_data, (int)orderIn.price));
       record.setAttribute(OrderHistoryListGrid.QTY_FIELD, orderIn.quantity);
       record.setAttribute(OrderHistoryListGrid.FILLED_QTY_FIELD,
                           orderIn.filled_quantity);
@@ -324,8 +342,7 @@ public class OrderHistoryListGrid extends ListGrid {
       listGridRecord.setAttribute(OrderHistoryListGrid.FILLED_QTY_FIELD,
                                   orderIn.filled_quantity);
       listGridRecord.setAttribute(OrderHistoryListGrid.FILLED_PRICE_FIELD,
-                                  orderIn.filled_avg_price /
-                                      PriceLevel.TICK_SIZE);
+    		  						ConvertUtils.getDisplayPrice(instrument_with_ref_data, (int)orderIn.filled_avg_price ) );
       listGridRecord.setAttribute(OrderHistoryListGrid.LAST_TIMESTAMP_FIELD,
                                   orderIn.lastUpdateTime);
       listGridRecord.setAttribute(

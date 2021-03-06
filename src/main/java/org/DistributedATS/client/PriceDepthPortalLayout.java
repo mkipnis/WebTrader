@@ -64,8 +64,8 @@ public class PriceDepthPortalLayout extends PortalLayout {
 				 
 			 Instrument instrument = new Instrument(exchangeField, symbolField);
 
-			 webTrader.setActiveInstrument(instrument);
-			 webTrader.getTicketCanvas().populateTicket(lastPrice, 100);
+			 //webTrader.setActiveInstrument(instrument);
+			 //webTrader.getTicketCanvas().populateTicket(lastPrice, 100);
 
 			 PriceDepthPortlet currentPriceDepthPortlet = priceDepthCanvasMap.get(instrument);
 
@@ -73,10 +73,12 @@ public class PriceDepthPortalLayout extends PortalLayout {
 				 priceDepthCanvasMap.remove(instrument);
 				 super.removePortlet(currentPriceDepthPortlet);
 			 }
+			 
+			 Instrument instrumentWithRefData = WebTrader.getInstance().getInstrumentWithRefData(instrument);
 
-			 PriceDepthPortlet portlet = new PriceDepthPortlet(instrument);
+			 PriceDepthPortlet portlet = new PriceDepthPortlet(instrumentWithRefData);
 
-			 priceDepthCanvasMap.put(instrument, portlet);
+			 priceDepthCanvasMap.put(instrumentWithRefData, portlet);
 			 
 		      WebTrader.getInstance().getTicketCanvas().setDisabled(false);
 
@@ -96,7 +98,7 @@ public class PriceDepthPortalLayout extends PortalLayout {
             		 fixSessionData.instrumentMarketDataSnapshot.get(instrument);
 
              if (marketDataSnapshot != null) {
-               priceDepthCanvas.updatePriceDepth(marketDataSnapshot);
+               priceDepthCanvas.updatePriceDepth(instrument, marketDataSnapshot);
              }
            }
 	 }

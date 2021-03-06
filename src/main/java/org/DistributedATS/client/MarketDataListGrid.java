@@ -33,6 +33,7 @@ import com.smartgwt.client.data.DSCallback;
 import com.smartgwt.client.data.DSRequest;
 import com.smartgwt.client.data.DSResponse;
 import com.smartgwt.client.data.DataSource;
+import com.smartgwt.client.data.fields.DataSourceDateField;
 import com.smartgwt.client.data.fields.DataSourceFloatField;
 import com.smartgwt.client.data.fields.DataSourceTextField;
 import com.smartgwt.client.types.Alignment;
@@ -49,6 +50,8 @@ import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+
+import org.DistributedATS.shared.ConvertUtils;
 import org.DistributedATS.shared.Instrument;
 import org.DistributedATS.shared.MarketDataSnapshot;
 import org.DistributedATS.shared.Position;
@@ -129,17 +132,19 @@ public class MarketDataListGrid extends ListGrid {
         final String instrumentName =
             record.getAttributeAsString(MarketDataCanvas.INSTRUMENT_FIELD);
 
-        Double ticketPrice = 0.0;
+        Integer ticketPrice = 0;
         Integer ticketSize = 100;
+        
+        HashMap<String, Integer> ticks = (HashMap<String, Integer>)record.getAttributeAsMap(MarketDataCanvas.TICKS_FIELD);
 
         if (event.getField().getName().contains("ASK")) {
           ticketPrice =
-              record.getAttributeAsDouble(MarketDataCanvas.ASK_PRICE_FIELD);
+        		  ticks.get(MarketDataCanvas.ASK_PRICE_FIELD);
           ticketSize =
               record.getAttributeAsInt(MarketDataCanvas.ASK_SIZE_FIELD);
         } else if (event.getField().getName().contains("BID")) {
           ticketPrice =
-              record.getAttributeAsDouble(MarketDataCanvas.BID_PRICE_FIELD);
+        		  ticks.get(MarketDataCanvas.BID_PRICE_FIELD);
           ticketSize =
               record.getAttributeAsInt(MarketDataCanvas.BID_SIZE_FIELD);
         }
@@ -149,13 +154,13 @@ public class MarketDataListGrid extends ListGrid {
         if (ticketPrice == null || ticketPrice == 0.0)
         {
         	ticketPrice =
-              record.getAttributeAsDouble(MarketDataCanvas.LAST_TRADED_PRICE);
+        			 ticks.get(MarketDataCanvas.LAST_TRADED_PRICE);
         	ticketSize = 100;
         }
         
         if (ticketPrice == null || ticketPrice == 0.0)
           ticketPrice =
-              record.getAttributeAsDouble(MarketDataCanvas.OPEN_PRICE);
+        		  ticks.get(MarketDataCanvas.OPEN_PRICE);
 
         Instrument instrument = getInstrumentNameMap().get(instrumentName);
 
@@ -167,10 +172,20 @@ public class MarketDataListGrid extends ListGrid {
 
     ListGridField instrumentField =
         new ListGridField(MarketDataCanvas.INSTRUMENT_FIELD, "Instrument", 120);
+    
     ListGridField bidPriceField =
         new ListGridPriceField(MarketDataCanvas.BID_PRICE_FIELD, "Bid");
+
+    
     ListGridField askPriceField =
         new ListGridPriceField(MarketDataCanvas.ASK_PRICE_FIELD, "Ask");
+
+    ListGridField ticksField =
+            new ListGridPriceField(MarketDataCanvas.TICKS_FIELD, "ticks");
+    
+    ticksField.setHidden(true);
+
+    
     ListGridField bidSizeField =
         new ListGridField(MarketDataCanvas.BID_SIZE_FIELD, "BidSize");
     ListGridField askSizeField =
@@ -189,6 +204,12 @@ public class MarketDataListGrid extends ListGrid {
             }  
         }  
     });  
+    
+    ListGridField cusipField =
+            new ListGridField(MarketDataCanvas.CUSIP_FIELD, "Cusip");
+    
+    ListGridField maturityDateField =
+            new ListGridField(MarketDataCanvas.MATURITY_DATE_FIELD, "MaturityDate");
     
     ListGridField positionField =
         new ListGridField(MarketDataCanvas.POSITION, "Position");
@@ -314,11 +335,22 @@ public class MarketDataListGrid extends ListGrid {
     DataSourceFloatField priceChangeFieldDS =
         new DataSourceFloatField(MarketDataCanvas.PRICE_CHANGE);
     ds.addField(priceChangeFieldDS);
+    
+    DataSourceTextField cusipFieldDS =
+            new DataSourceTextField(MarketDataCanvas.CUSIP_FIELD);
+        ds.addField(cusipFieldDS);
+        
+    DataSourceDateField maturityDateFieldDS =
+                 new DataSourceDateField(MarketDataCanvas.MATURITY_DATE_FIELD);
+    ds.addField(maturityDateFieldDS);
 
     setFields(instrumentField, positionField, lastTradedPriceField,
               priceChangeField, vwapField, pnlField, bidPriceField,
               askPriceField, bidSizeField, askSizeField, volumeField,
-              exchangeField, symbolField, openPriceField);
+              exchangeField, symbolField, openPriceField, cusipField,
+              maturityDateField, ticksField);
+    
+    
     setDataSource(ds);
 
     setGridComponents(new Object[] {ListGridComponent.HEADER,
@@ -356,8 +388,16 @@ public class MarketDataListGrid extends ListGrid {
     record.setAttribute(MarketDataCanvas.EXCHANGE_FIELD,
                         instrument.getSecurityExchange());
     record.setAttribute(MarketDataCanvas.SYMBOL_FIELD, instrument.getSymbol());
+    
+    // re-thing and re-factor
+    Integer instrumentWithRefDataIndex = WebTrader.getInstance().getCompleteSecurityList().indexOf(instrument);
+    
+    Instrument instrumentWithRefData = WebTrader.getInstance().getCompleteSecurityList().get(instrumentWithRefDataIndex);
+    
+    record.setAttribute(MarketDataCanvas.CUSIP_FIELD, instrumentWithRefData.getCusip());
+    record.setAttribute(MarketDataCanvas.MATURITY_DATE_FIELD, ConvertUtils.intToDate(instrumentWithRefData.getMaturityDate()));
 
-    listGridRecordMap.put(instrument, record);
+    listGridRecordMap.put(instrumentWithRefData, record);
 
     ds.addData(record);
   }
@@ -369,27 +409,46 @@ public class MarketDataListGrid extends ListGrid {
       if (listGridRecord != null) {
         Position position = positionData.get(instrument);
 
-        Double lastTradedPrice = listGridRecord.getAttributeAsDouble(
-            MarketDataCanvas.LAST_TRADED_PRICE);
+       // Double lastTradedPrice = listGridRecord.getAttributeAsDouble(
+        //    MarketDataCanvas.LAST_TRADED_PRICE);
 
-        if (position == null || lastTradedPrice == null)
+        HashMap<String, Integer> ticks = (HashMap<String, Integer>)listGridRecord.getAttributeAsMap(MarketDataCanvas.TICKS_FIELD);
+        
+        Integer lastTradedPriceTicks =
+      		  ticks.get(MarketDataCanvas.LAST_TRADED_PRICE);
+        
+        if (position == null || lastTradedPriceTicks == null)
           continue;
 
-        Double vwap = position.getVWAP() / PriceLevel.TICK_SIZE;
+        Instrument instrument_with_ref_data = WebTrader.getInstance().getInstrumentWithRefData(instrument);
+        
+        double vwap = position.getVWAP()/instrument_with_ref_data.getTickSize();
+        listGridRecord.setAttribute(MarketDataCanvas.VWAP,  vwap);
 
+        // TODO: P&L for treasuries and others
+       
         Double positionAmt = position.buy_amt - position.sell_amt;
+        
+        double lastTradedPrice = lastTradedPriceTicks/instrument_with_ref_data.getTickSize().floatValue();
 
         listGridRecord.setAttribute(MarketDataCanvas.POSITION, positionAmt);
-        listGridRecord.setAttribute(MarketDataCanvas.VWAP, vwap);
         if (positionAmt != 0)
           listGridRecord.setAttribute(MarketDataCanvas.PNL,
                                       (lastTradedPrice - vwap) * positionAmt);
         else
-          listGridRecord.setAttribute(
-              MarketDataCanvas.PNL,
-              (position.sell_amt * position.sell_avg_price -
-               position.buy_amt * position.buy_avg_price) /
-                  PriceLevel.TICK_SIZE);
+        	if ( instrument_with_ref_data.getTickSize()%256==0)
+        	{
+        		listGridRecord.setAttribute(
+        				MarketDataCanvas.PNL,
+        				(position.sell_amt * position.sell_avg_price -
+        						position.buy_amt * position.buy_avg_price) / instrument_with_ref_data.getTickSize() / 100 /*percent of par*/);
+        	} else {
+           		listGridRecord.setAttribute(
+        				MarketDataCanvas.PNL,
+        				(position.sell_amt * position.sell_avg_price -
+        						position.buy_amt * position.buy_avg_price) / instrument_with_ref_data.getTickSize() );
+        	}
+             
 
         updateData(listGridRecord);
       }
@@ -397,6 +456,23 @@ public class MarketDataListGrid extends ListGrid {
 
     fetchData();
   }
+  
+  private void insertPriceInTicksButSetVisiblePriceToHumanReadable(
+		  String list_grid_field,
+		  ListGridRecord listGridRecord,
+		  Instrument instrument,
+		  HashMap<String, Integer> ticks_map,
+		  Integer price_in_ticks)
+  {
+	  
+	  String price_str = "";
+	 
+	  
+	  listGridRecord.setAttribute(list_grid_field, ConvertUtils.getDisplayPrice(instrument, price_in_ticks));
+	  
+	  ticks_map.put( list_grid_field, price_in_ticks);
+  }
+  
 
   public void updateTopLevelMarketData(
       HashMap<Instrument, MarketDataSnapshot> marketDataSnapshots) {
@@ -413,10 +489,16 @@ public class MarketDataListGrid extends ListGrid {
 
       PriceLevel bestBid = marketDataSnapshot.getBidSide().get(0);
       PriceLevel bestAsk = marketDataSnapshot.getAskSide().get(0);
+      
+      HashMap<String, Integer> ticks = new HashMap<String, Integer>();
 
-      if (bestBid != null && bestBid.getPrice() != 0.0) {
-        listGridRecord.setAttribute(MarketDataCanvas.BID_PRICE_FIELD,
-                                    bestBid.getPrice());
+      if (bestBid != null && bestBid.getPrice() != 0) {
+    	  
+    	insertPriceInTicksButSetVisiblePriceToHumanReadable(MarketDataCanvas.BID_PRICE_FIELD, 
+    			listGridRecord, instrument, ticks, bestBid.getPrice());
+    	  
+        //listGridRecord.setAttribute(MarketDataCanvas.BID_PRICE_FIELD,
+        //                            bestBid.getPrice());
         listGridRecord.setAttribute(MarketDataCanvas.BID_SIZE_FIELD,
                                     bestBid.getSize());
       } else {
@@ -425,8 +507,11 @@ public class MarketDataListGrid extends ListGrid {
       }
 
       if (bestAsk != null && bestAsk.getPrice() != 0.0) {
-        listGridRecord.setAttribute(MarketDataCanvas.ASK_PRICE_FIELD,
-                                    bestAsk.getPrice());
+    	  
+      	insertPriceInTicksButSetVisiblePriceToHumanReadable(MarketDataCanvas.ASK_PRICE_FIELD, 
+    			listGridRecord, instrument, ticks, bestAsk.getPrice());
+       // listGridRecord.setAttribute(MarketDataCanvas.ASK_PRICE_FIELD,
+        //                            bestAsk.getPrice());
         listGridRecord.setAttribute(MarketDataCanvas.ASK_SIZE_FIELD,
                                     bestAsk.getSize());
       } else {
@@ -434,17 +519,33 @@ public class MarketDataListGrid extends ListGrid {
         listGridRecord.setAttribute(MarketDataCanvas.ASK_SIZE_FIELD, "");
       }
 
-      listGridRecord.setAttribute(MarketDataCanvas.LAST_TRADED_PRICE,
-                                  marketDataSnapshot.getLastTradedPrice());
+    	insertPriceInTicksButSetVisiblePriceToHumanReadable(MarketDataCanvas.LAST_TRADED_PRICE, 
+  			listGridRecord, instrument, ticks,  marketDataSnapshot.getLastTradedPrice());
+    	
+      //listGridRecord.setAttribute(MarketDataCanvas.LAST_TRADED_PRICE,
+      //                            marketDataSnapshot.getLastTradedPrice());
       listGridRecord.setAttribute(MarketDataCanvas.VOLUME,
                                   marketDataSnapshot.getVolume());
-      listGridRecord.setAttribute(MarketDataCanvas.OPEN_PRICE,
-                                  marketDataSnapshot.getOpenPrice());
+      
+  	insertPriceInTicksButSetVisiblePriceToHumanReadable(MarketDataCanvas.OPEN_PRICE, 
+			listGridRecord, instrument, ticks,  marketDataSnapshot.getOpenPrice());
+      
+     // listGridRecord.setAttribute(MarketDataCanvas.OPEN_PRICE,
+     //                             marketDataSnapshot.getOpenPrice());
 
       if (marketDataSnapshot.getLastTradedPrice() != 0)
-        listGridRecord.setAttribute(MarketDataCanvas.PRICE_CHANGE,
-                                    marketDataSnapshot.getLastTradedPrice() -
-                                        marketDataSnapshot.getOpenPrice());
+      {
+    	  	insertPriceInTicksButSetVisiblePriceToHumanReadable(MarketDataCanvas.PRICE_CHANGE, 
+    				listGridRecord, instrument, ticks,  marketDataSnapshot.getLastTradedPrice() -
+    													marketDataSnapshot.getOpenPrice());
+    	  	
+        //listGridRecord.setAttribute(MarketDataCanvas.PRICE_CHANGE,
+        //                            marketDataSnapshot.getLastTradedPrice() -
+        //                                marketDataSnapshot.getOpenPrice());
+      }
+      
+      listGridRecord.setAttribute(MarketDataCanvas.TICKS_FIELD, ticks);
+      
 
       updateData(listGridRecord, new DSCallback() {
         @Override
