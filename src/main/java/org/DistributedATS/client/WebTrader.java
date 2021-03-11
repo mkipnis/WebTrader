@@ -304,7 +304,7 @@ public class WebTrader implements EntryPoint {
           }
 
           stateMask |= 1 << FIXUserSession.ORDERS_DATA_BIT;
-          logonCheckTimer.schedule(250);
+          logonCheckTimer.schedule(1000);
         }
       }
     });
