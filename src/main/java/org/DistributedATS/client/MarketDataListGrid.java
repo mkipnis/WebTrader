@@ -542,6 +542,9 @@ public class MarketDataListGrid extends ListGrid {
         //listGridRecord.setAttribute(MarketDataCanvas.PRICE_CHANGE,
         //                            marketDataSnapshot.getLastTradedPrice() -
         //                                marketDataSnapshot.getOpenPrice());
+      } else {
+  	  	insertPriceInTicksButSetVisiblePriceToHumanReadable(MarketDataCanvas.PRICE_CHANGE, 
+  				listGridRecord, instrument, ticks, 0);
       }
       
       listGridRecord.setAttribute(MarketDataCanvas.TICKS_FIELD, ticks);

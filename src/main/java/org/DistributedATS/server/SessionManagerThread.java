@@ -57,7 +57,7 @@ public class SessionManagerThread implements Runnable {
 	    	  {
 	    		  Timestamp lastTimestamp = sessionPollTimestampMap.get(sessionID);
 	    		  	    		  
-	    		  if ( (System.currentTimeMillis() - lastTimestamp.getTime()) > 30000 )
+	    		  if ( (System.currentTimeMillis() - lastTimestamp.getTime()) > 30000*1000 )
 	    		  {
 	    			    System.out.println("Browser with session id : " + sessionID + " has not polled in 30 seconds - Disconnecting");
 

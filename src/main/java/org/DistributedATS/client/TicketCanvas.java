@@ -108,7 +108,7 @@ public class TicketCanvas extends Canvas {
     priceItem.setValue( price, webTrader.getActiveInstrument() );
     //priceItem.setValue("100-25");
 
-    quantityItem.setValue(quantity);
+    quantityItem.setValue(quantity);    
   }
 
   public class CancelAllClickHandler
@@ -157,9 +157,10 @@ public class TicketCanvas extends Canvas {
     priceSpinnerItem.setName("Price");
     priceSpinnerItem.setDefaultValue(1);
     priceSpinnerItem.setRowSpan(2);
+    //priceSpinnerItem.setColSpan(2);
     priceSpinnerItem.setTitleOrientation(TitleOrientation.TOP);
-    priceSpinnerItem.setMin(0.05);
-    priceSpinnerItem.setStep(0.05);
+  //  priceSpinnerItem.setMin(0.05);
+  //  priceSpinnerItem.setStep(0.05);
     priceSpinnerItem.setStartRow(false);
     priceSpinnerItem.setEndRow(false);
    
@@ -168,12 +169,14 @@ public class TicketCanvas extends Canvas {
     quantitySpinnerItem.setName("Quantity");
     quantitySpinnerItem.setDefaultValue(100);
     quantitySpinnerItem.setMin(1);
-    quantitySpinnerItem.setStep(10);
+   quantitySpinnerItem.setStep(10);
     // quantitySpinnerItem.setWrapTitle(true);
     quantitySpinnerItem.setRowSpan(2);
     quantitySpinnerItem.setTitleOrientation(TitleOrientation.TOP);
     quantitySpinnerItem.setStartRow(false);
     quantitySpinnerItem.setEndRow(true);
+    
+ 
     
   
 
