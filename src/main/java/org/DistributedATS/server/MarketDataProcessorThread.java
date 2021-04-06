@@ -264,6 +264,12 @@ public class MarketDataProcessorThread implements Runnable {
     for (Instrument instrument : sessionStateRequest.activeSecurityList) {
     	
       MarketDataSnapshot marketDataSnapshot = sessionMarketData.get(instrument);
+      
+      if ( marketDataSnapshot == null )
+      {
+    	  sessionState.instrumentMarketDataSnapshot.put(instrument, new MarketDataSnapshot());
+    	  continue;
+      }
 
       // only include market data that was changed since the latest poll
       if (sessionStateRequest.marketDataSequenceNumber <

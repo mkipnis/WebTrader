@@ -39,6 +39,8 @@ import com.smartgwt.client.widgets.form.fields.events.FormItemClickHandler;
 import com.smartgwt.client.widgets.form.fields.events.FormItemIconClickEvent;
 import com.smartgwt.client.widgets.form.fields.events.KeyDownEvent;
 import com.smartgwt.client.widgets.form.fields.events.KeyDownHandler;
+import com.smartgwt.client.widgets.form.fields.events.KeyUpEvent;
+import com.smartgwt.client.widgets.form.fields.events.KeyUpHandler;
 
 
 public class SpinnerItemWebTrader extends SpinnerItem {
@@ -46,6 +48,9 @@ public class SpinnerItemWebTrader extends SpinnerItem {
 	public Integer current_value;
 	
 	public Instrument m_instrument_with_ref_data;
+	
+	private boolean was_change_applied = true; // when value was changes with tab or enter pressed
+	private String last_entered_text = "";
 	
 	public SpinnerItemWebTrader()
 	{		
@@ -63,10 +68,26 @@ public class SpinnerItemWebTrader extends SpinnerItem {
 					current_value = ConvertUtils.getTicksFromDisplayPrice(m_instrument_with_ref_data, price_text);
 				
 					setValue(current_value);
+					
+					was_change_applied = true;
+				} else {
+					
+					was_change_applied = false;
 				}
 			}
 			
 		});
+		
+		this.addKeyUpHandler( new KeyUpHandler()
+				{
+
+					@Override
+					public void onKeyUp(KeyUpEvent event) {
+						// TODO Auto-generated method stub
+						last_entered_text = getEnteredValue().toString();
+					}
+			
+				});
 		
 		
 		setEditorValueFormatter(new FormItemValueFormatter (){
@@ -101,6 +122,12 @@ public class SpinnerItemWebTrader extends SpinnerItem {
 			@Override
 			public void onFormItemClick(FormItemIconClickEvent event) {
 					// TODO Auto-generated method stub
+					if ( was_change_applied == false )
+					{				
+						current_value = ConvertUtils.getTicksFromDisplayPrice(m_instrument_with_ref_data, last_entered_text);
+						was_change_applied = true;
+					}
+					
 					current_value -= 1;
 					setValue( current_value );
 				}
@@ -113,6 +140,12 @@ public class SpinnerItemWebTrader extends SpinnerItem {
 			@Override
 			public void onFormItemClick(FormItemIconClickEvent event) {
 					// TODO Auto-generated method stub
+					if ( was_change_applied == false )
+					{	
+						current_value = ConvertUtils.getTicksFromDisplayPrice(m_instrument_with_ref_data, last_entered_text);
+						was_change_applied = true;
+					}
+					
 					current_value += 1;
 					setValue( current_value );
 				}
@@ -123,8 +156,15 @@ public class SpinnerItemWebTrader extends SpinnerItem {
 	
 	public Integer getValueInTicks()
 	{
+		if ( this.was_change_applied == false )
+		{				
+			current_value = ConvertUtils.getTicksFromDisplayPrice(m_instrument_with_ref_data, this.last_entered_text);
+	
+			setValue(current_value);
+			was_change_applied = true;
+		}
+		
 		return current_value;
 	}
 	
-
 }

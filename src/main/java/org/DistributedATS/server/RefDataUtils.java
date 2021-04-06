@@ -45,13 +45,18 @@ public class RefDataUtils {
 			 
        	      // TODO: deal with unset data 
        		  JSONObject ref_data = new JSONObject(ref_data_text);
+       		  
+       		  String security_type = ref_data.getString("security_type");
          
-       		  instrument.setCusip( ref_data.getString("cusip") );
-       		  instrument.setIssueDate( ConvertUtils.dateToInt(
+       		  if ( !security_type.equalsIgnoreCase("repo") )
+       		  {
+       			  instrument.setCusip( ref_data.getString("cusip") );
+       			  instrument.setIssueDate( ConvertUtils.dateToInt(
        				  formatter.parse( ref_data.getString("issue_date") ) ) );
-       		  instrument.setMaturityDate( ConvertUtils.dateToInt(
+       			  instrument.setMaturityDate( ConvertUtils.dateToInt(
        				  formatter.parse( ref_data.getString("maturity_date") ) ) );
-  
+       		  }
+       			  
        		  instrument.setTickSize( ref_data.getInt("tick_size")  );
        	  } catch (Exception exp )
        	  {

@@ -151,14 +151,14 @@ public class MarketDataListGrid extends ListGrid {
 
         // no market, no problem ... lets get last traded or open price if last
         // price is not available
-        if (ticketPrice == null || ticketPrice == 0.0)
+        if (ticketPrice == null || ticketPrice == 0.0 )
         {
         	ticketPrice =
         			 ticks.get(MarketDataCanvas.LAST_TRADED_PRICE);
         	ticketSize = 100;
         }
         
-        if (ticketPrice == null || ticketPrice == 0.0)
+        if (ticketPrice == null || ticketPrice == 0.0 )
           ticketPrice =
         		  ticks.get(MarketDataCanvas.OPEN_PRICE);
 
@@ -492,7 +492,7 @@ public class MarketDataListGrid extends ListGrid {
       
       HashMap<String, Integer> ticks = new HashMap<String, Integer>();
 
-      if (bestBid != null && bestBid.getPrice() != 0) {
+      if (bestBid != null && bestBid.getSize() != 0) {
     	  
     	insertPriceInTicksButSetVisiblePriceToHumanReadable(MarketDataCanvas.BID_PRICE_FIELD, 
     			listGridRecord, instrument, ticks, bestBid.getPrice());
@@ -506,7 +506,7 @@ public class MarketDataListGrid extends ListGrid {
         listGridRecord.setAttribute(MarketDataCanvas.BID_SIZE_FIELD, "");
       }
 
-      if (bestAsk != null && bestAsk.getPrice() != 0.0) {
+      if (bestAsk != null && bestAsk.getSize() != 0.0 ) {
     	  
       	insertPriceInTicksButSetVisiblePriceToHumanReadable(MarketDataCanvas.ASK_PRICE_FIELD, 
     			listGridRecord, instrument, ticks, bestAsk.getPrice());
@@ -533,7 +533,7 @@ public class MarketDataListGrid extends ListGrid {
      // listGridRecord.setAttribute(MarketDataCanvas.OPEN_PRICE,
      //                             marketDataSnapshot.getOpenPrice());
 
-      if (marketDataSnapshot.getLastTradedPrice() != 0)
+      if (marketDataSnapshot.getVolume() != 0)
       {
     	  	insertPriceInTicksButSetVisiblePriceToHumanReadable(MarketDataCanvas.PRICE_CHANGE, 
     				listGridRecord, instrument, ticks,  marketDataSnapshot.getLastTradedPrice() -
